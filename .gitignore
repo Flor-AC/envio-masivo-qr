@@ -1,0 +1,14 @@
+# Ignorar carpetas de compilación
+target/
+
+# Ignorar configuración de VS Code
+.vscode/
+
+# Ignorar archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de configuración de otros IDEs
+.settings/
+.classpath
+.project

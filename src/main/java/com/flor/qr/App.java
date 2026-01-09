@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 public class App {
+
     public static void main(String[] args) {
         // Formato de fecha para el archivo de seguimiento (Log)
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -18,7 +19,7 @@ public class App {
             if (Config.get("path.excel") == null) {
                 System.err.println("❌ ERROR CRÍTICO: No se pudo leer el archivo de configuración.");
                 System.err.println("Asegúrate de que el archivo en resources se llame 'config.properties' (con 'ig').");
-                return; 
+                return;
             }
 
             // 2. CARGA DE DATOS Y HERRAMIENTAS
@@ -36,7 +37,7 @@ public class App {
             // 3. PROCESO DE ENVÍO CON SEGUIMIENTO (LOG)
             // Abrimos el archivo CSV en modo 'append' para no borrar registros previos
             try (PrintWriter logWriter = new PrintWriter(new FileWriter(rutaLog, true))) {
-                
+
                 // Si el proceso es nuevo, puedes identificarlo en el archivo
                 logWriter.println("--- Nueva Sesión de Envío: " + dtf.format(LocalDateTime.now()) + " ---");
                 logWriter.println("Fecha,Referencia,Nombre,Correo,Estado,Observaciones");
@@ -44,13 +45,13 @@ public class App {
                 for (int i = 0; i < clientes.size(); i++) {
                     Cliente c = clientes.get(i);
                     String fechaActual = dtf.format(LocalDateTime.now());
-                    
+
                     System.out.print("[" + (i + 1) + "/" + clientes.size() + "] Enviando a: " + c.getNombre() + "... ");
 
                     try {
                         // Llamada al método corregido (asegúrate que en EmailSender se llame así)
                         sender.enviarCorreoAdjunto(c, Config.get("path.pdfs"));
-                        
+
                         // Registro de éxito en el CSV
                         logWriter.println(fechaActual + "," + c.getReferencia() + "," + c.getNombre() + "," + c.getCorreo() + ",ENVIADO,OK");
                         System.out.println("✅");
@@ -67,7 +68,8 @@ public class App {
                     // 4. PAUSA DE SEGURIDAD: Límite de ráfaga de Microsoft 365
                     // Mantenemos 15 segundos (4 correos por minuto) para evitar bloqueos.
                     if (i < clientes.size() - 1) {
-                        Thread.sleep(Integer.parseInt(Config.get("pausa.milisegundos")));
+                        // El .trim() limpia cualquier espacio oculto antes de convertirlo en número
+                        Thread.sleep(Integer.parseInt(Config.get("pausa.milisegundos").trim()));
                     }
                 }
             }

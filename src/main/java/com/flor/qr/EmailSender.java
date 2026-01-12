@@ -33,6 +33,7 @@ public class EmailSender {
         props.put("mail.smtp.starttls.enable", Config.get("mail.smtp.starttls.enable"));
         props.put("mail.smtp.host", Config.get("mail.smtp.host"));
         props.put("mail.smtp.port", Config.get("mail.smtp.port"));
+        props.put("mail.asunto", Config.get("mail.asunto"));
 
         //Sesión y autenticación
         Session session = Session.getInstance(props, new Authenticator() {
@@ -47,7 +48,11 @@ public class EmailSender {
             Message message = new MimeMessage(session);
             message.setFrom(new InternetAddress(remitente));
             message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(cliente.getCorreo()));
-            message.setSubject(Config.get("mail.asunto"));
+            //message.setSubject(Config.get("mail.asunto"));
+
+            // En lugar de solo el texto fijo, le pegamos el nombre de la empresa o la referencia
+            String asuntoPersonalizado = Config.get("mail.asunto").trim() + " - " + cliente.getNombre();
+            message.setSubject(asuntoPersonalizado);
 
             //Cuerpo del mensaje
             MimeBodyPart cuerpoHtml = new MimeBodyPart();
@@ -70,8 +75,6 @@ public class EmailSender {
                     + "<li>Presentarlo en cada visita a los centros de acopio</li>"
                     + "<li>Verificar que la información registrada corresponda a su empresa</li>"
                     + "</ul>"
-                    + "<p><b>LINK DE DESCARGA</b><br>"
-                    + "<a href='https://drive.google.com/file/d/16HRedMJK_v-DmmL1iTdJqECdSu9-smMd/view?usp=drive_link' style='color: #007bff;'>Ver/Descargar Código QR General</a></p>"
                     + "<p>Para cualquier duda, aclaración o apoyo relacionado con el uso del Código QR o el proceso de registro, ponemos a su disposición los canales de contacto de la Dirección General de Ecología.</p>"
                     + "<p>Agradecemos su colaboración y compromiso con una gestión de residuos responsable, ordenada y alineada a los principios de la economía circular.</p>"
                     + "<p>Atentamente,<br><br>---------------------<br><b>Dirección General de Ecología</b><br>"
